@@ -4,43 +4,57 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public CharacterController controller; // Character Controller
-    public float speed = 12f;              // Movement speed
-    public float gravity = -500f;          // Extremely strong gravity for instant fall
-    public float jumpHeight = 0.1f;        // Minimal jump height for almost no airtime
+    private CharacterController controller;
+    public float speed = 5f;
+    private bool isGrounded;
+    public float gravity = -9.8f;
+    private Vector3 playervelocity;
+    public float jumpHeight = 3f;
 
-    private Vector3 velocity;              // Velocity vector for movement
-    private bool isGrounded;               // Is the player on the ground?
-
-    public Transform groundCheck;          // Ground detection object
-    public float groundDistance = 0.4f;    // Radius for ground detection
-    public LayerMask groundMask;           // Layer mask for ground
+    void Start()
+    {
+        // Get the CharacterController component attached to the player
+        controller = GetComponent<CharacterController>();
+    }
 
     void Update()
     {
-        // Ground detection
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        isGrounded = controller.isGrounded;
+    }
 
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f; // Reset vertical velocity to keep grounded
-        }
+    public void ProcessMove(Vector2 input)
+    {
+        // Create a movement vector based on the input
+        Vector3 moveDirection = Vector3.zero;
+        moveDirection.x = input.x; // Left/Right movement
+        moveDirection.z = input.y; // Forward/Backward movement
 
-        // Movement
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        // Transform the move direction to match the player's orientation
+        Vector3 worldMoveDirection = transform.TransformDirection(moveDirection);
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * speed * Time.deltaTime);
-
-        // Jumping
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity); // Tiny upward jump
-        }
+        // Apply the movement using the CharacterController
+        controller.Move(worldMoveDirection * speed * Time.deltaTime);
 
         // Apply gravity
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        playervelocity.y += gravity * Time.deltaTime;
+
+        // Apply vertical movement
+        controller.Move(playervelocity * Time.deltaTime);
+
+        // Reset velocity when grounded
+        if (isGrounded && playervelocity.y < 0)
+            playervelocity.y = -2f;
+
+        // Debug log for player velocity
+        Debug.Log(playervelocity);
+    }
+
+    public void Jump()
+    {
+        if (isGrounded)
+        {
+            // Calculate jump velocity
+            playervelocity.y = Mathf.Sqrt(jumpHeight * -3f * gravity);
+        }
     }
 }
