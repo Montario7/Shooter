@@ -45,8 +45,7 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded && playervelocity.y < 0)
             playervelocity.y = -2f;
 
-        // Debug log for player velocity
-        Debug.Log(playervelocity);
+    
     }
 
     public void Jump()

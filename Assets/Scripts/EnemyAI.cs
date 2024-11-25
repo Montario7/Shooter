@@ -1,39 +1,52 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    public Transform player;          // Assign the player's Transform in the Inspector
-    private NavMeshAgent agent;       // NavMeshAgent to handle movement
+    public Transform player;           // Player's Transform
+    private NavMeshAgent agent;        // NavMeshAgent for movement
 
-    public float detectionRange = 10f; // Range to detect the player
-    public float health = 100f;       // Enemy health
+    [Header("Enemy Settings")]
+    public float detectionRange = 10f; // Enemy detection range
+    public float attackRange = 5f;     // Enemy attack range
+    public float health = 100f;        // Enemy health
+    public float attackDamage = 10f;   // Damage dealt to the player
+    public float attackCooldown = 2f; // Time between attacks
 
-    // Patrol settings
-    public float patrolRange = 20f;   // Radius for random patrol points
-    public float patrolWaitTime = 2f; // Time to wait at each patrol point
+    private float lastAttackTime = 0f; // Tracks time since the last attack
+
+    [Header("Patrol Settings")]
+    public float patrolRange = 20f;    // Radius for random patrol points
+    public float patrolWaitTime = 2f;  // Time to wait at each patrol point
     private bool isPatrolling = false;
-    private Vector3 patrolPoint;
+    private Vector3 patrolPoint;       // Current patrol target point
+    private bool playerInRange = false;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        StartPatrol(); // Start the patrolling behavior
+        StartPatrol(); // Start patrolling initially
     }
 
     void Update()
     {
-        // Check if the player is within detection range
-        if (player != null && Vector3.Distance(transform.position, player.position) <= detectionRange)
+        // Check distance to player
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        playerInRange = distanceToPlayer <= detectionRange;
+
+        if (playerInRange)
         {
-            StopPatrol(); // Stop patrolling
-            agent.SetDestination(player.position); // Move towards the player
+            ChasePlayer();
+
+            // Check if within attack range
+            if (distanceToPlayer <= attackRange)
+            {
+                AttackPlayer();
+            }
         }
         else
         {
-            // Continue patrolling if the player is out of range
             if (!isPatrolling)
             {
                 StartPatrol();
@@ -42,31 +55,48 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    // Start patrolling behavior
+    private void ChasePlayer()
+    {
+        StopPatrol(); // Stop patrolling
+        agent.SetDestination(player.position); // Move towards player
+    }
+
+    private void AttackPlayer()
+    {
+        // Only attack if enough time has passed since the last attack
+        if (Time.time >= lastAttackTime + attackCooldown)
+        {
+            PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(attackDamage); // Reduce player health
+                Debug.Log($"Enemy attacked the player for {attackDamage} damage!");
+            }
+
+            lastAttackTime = Time.time; // Reset attack timer
+        }
+    }
+
     private void StartPatrol()
     {
         isPatrolling = true;
         SetRandomPatrolPoint();
     }
 
-    // Patrol to the assigned point
     private void Patrol()
     {
-        // Check if the enemy has reached the patrol point
         if (agent.remainingDistance <= agent.stoppingDistance && !agent.pathPending)
         {
             StartCoroutine(WaitBeforeNextPatrol());
         }
     }
 
-    // Stop patrolling behavior
     private void StopPatrol()
     {
         isPatrolling = false;
-        StopCoroutine(WaitBeforeNextPatrol());
+        StopAllCoroutines(); // Stop any ongoing patrol routines
     }
 
-    // Set a random patrol point within the patrol range
     private void SetRandomPatrolPoint()
     {
         Vector3 randomDirection = Random.insideUnitSphere * patrolRange;
@@ -80,7 +110,6 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    // Wait for a short time before moving to the next patrol point
     private IEnumerator WaitBeforeNextPatrol()
     {
         isPatrolling = false;
@@ -89,21 +118,19 @@ public class EnemyAI : MonoBehaviour
         isPatrolling = true;
     }
 
-    // Function to take damage
     public void TakeDamage(float damageAmount)
     {
         health -= damageAmount;
 
         if (health <= 0f)
         {
-            Die(); // Call Die function when health is 0 or less
+            Die();
         }
     }
 
-    // Function to handle enemy death
     private void Die()
     {
-        Destroy(gameObject); // Destroy the enemy GameObject
         Debug.Log("Enemy has been defeated!");
+        Destroy(gameObject); // Destroy enemy GameObject
     }
 }
