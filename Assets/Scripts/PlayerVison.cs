@@ -16,14 +16,14 @@ public class Playervision : MonoBehaviour
         float mouseX = input.x;
         float mouseY = input.y;
 
-        // Adjust xRotation based on mouse Y input
+        // Adjusts xRotation based on mouse Y input
         xRotation -= mouseY * ySensitivity * Time.deltaTime;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
 
-        // Rotate the camera up/down
+        // Rotates the camera up/down
         Cam.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // Rotate the player left/right
+        // Rotates the player left/right
         transform.Rotate(Vector3.up * (mouseX * Time.deltaTime) * xSensitivity);
     }
 }

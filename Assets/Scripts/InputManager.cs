@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,7 +7,7 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     private PlayerInput playerInput;
-    private PlayerInput.InGameActions inGame; // Use InGameActions to match your action map name
+    private PlayerInput.InGameActions inGame; 
     private PlayerMovement movement;
     private Playervision vision;
 
@@ -19,7 +20,7 @@ public class InputManager : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         vision = GetComponent<Playervision>();
 
-        // Bind Jump input to the Jump method in PlayerMovement
+       
         inGame.Jump.performed += ctx => movement.Jump();
     }
 
@@ -38,11 +39,11 @@ public class InputManager : MonoBehaviour
 
     private void OnEnable()
     {
-        inGame.Enable(); // Enable the InGame action map
+        inGame.Enable(); 
     }
 
     private void OnDisable()
     {
-        inGame.Disable(); // Disable the InGame action map
+        inGame.Disable(); 
     }
 }

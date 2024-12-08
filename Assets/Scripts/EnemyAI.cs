@@ -4,34 +4,33 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    public Transform player;           // Player's Transform
-    private NavMeshAgent agent;        // NavMeshAgent for movement
+    public Transform player;
+    private NavMeshAgent agent;
 
     [Header("Enemy Settings")]
-    public float detectionRange = 10f; // Enemy detection range
-    public float attackRange = 5f;     // Enemy attack range
-    public float health = 100f;        // Enemy health
-    public float attackDamage = 10f;   // Damage dealt to the player
-    public float attackCooldown = 2f; // Time between attacks
+    public float detectionRange = 10f;
+    public float attackRange = 5f;
+    public float health = 100f;
+    public float attackDamage = 10f;
+    public float attackCooldown = 2f;
 
-    private float lastAttackTime = 0f; // Tracks time since the last attack
+    private float lastAttackTime = 0f;
 
     [Header("Patrol Settings")]
-    public float patrolRange = 20f;    // Radius for random patrol points
-    public float patrolWaitTime = 2f;  // Time to wait at each patrol point
+    public float patrolRange = 20f;
+    public float patrolWaitTime = 2f;
     private bool isPatrolling = false;
-    private Vector3 patrolPoint;       // Current patrol target point
+    private Vector3 patrolPoint;
     private bool playerInRange = false;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        StartPatrol(); // Start patrolling initially
+        StartPatrol();
     }
 
     void Update()
     {
-        // Check distance to player
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         playerInRange = distanceToPlayer <= detectionRange;
 
@@ -39,7 +38,6 @@ public class EnemyAI : MonoBehaviour
         {
             ChasePlayer();
 
-            // Check if within attack range
             if (distanceToPlayer <= attackRange)
             {
                 AttackPlayer();
@@ -57,23 +55,22 @@ public class EnemyAI : MonoBehaviour
 
     private void ChasePlayer()
     {
-        StopPatrol(); // Stop patrolling
-        agent.SetDestination(player.position); // Move towards player
+        StopPatrol();
+        agent.SetDestination(player.position);
     }
 
     private void AttackPlayer()
     {
-        // Only attack if enough time has passed since the last attack
         if (Time.time >= lastAttackTime + attackCooldown)
         {
             PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(attackDamage); // Reduce player health
+                playerHealth.TakeDamage(attackDamage);
                 Debug.Log($"Enemy attacked the player for {attackDamage} damage!");
             }
 
-            lastAttackTime = Time.time; // Reset attack timer
+            lastAttackTime = Time.time;
         }
     }
 
@@ -94,7 +91,7 @@ public class EnemyAI : MonoBehaviour
     private void StopPatrol()
     {
         isPatrolling = false;
-        StopAllCoroutines(); // Stop any ongoing patrol routines
+        StopAllCoroutines();
     }
 
     private void SetRandomPatrolPoint()
@@ -131,6 +128,6 @@ public class EnemyAI : MonoBehaviour
     private void Die()
     {
         Debug.Log("Enemy has been defeated!");
-        Destroy(gameObject); // Destroy enemy GameObject
+        Destroy(gameObject);
     }
 }

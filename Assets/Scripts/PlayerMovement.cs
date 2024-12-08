@@ -24,21 +24,21 @@ public class PlayerMovement : MonoBehaviour
 
     public void ProcessMove(Vector2 input)
     {
-        // Create a movement vector based on the input
+        // Creates a movement vector based on the input
         Vector3 moveDirection = Vector3.zero;
         moveDirection.x = input.x; // Left/Right movement
         moveDirection.z = input.y; // Forward/Backward movement
 
-        // Transform the move direction to match the player's orientation
+        // Transforms the move direction to match the player's orientation
         Vector3 worldMoveDirection = transform.TransformDirection(moveDirection);
 
-        // Apply the movement using the CharacterController
+        // Applys the movement using the CharacterController
         controller.Move(worldMoveDirection * speed * Time.deltaTime);
 
-        // Apply gravity
+        // Applys gravity
         playervelocity.y += gravity * Time.deltaTime;
 
-        // Apply vertical movement
+        // Applys vertical movement
         controller.Move(playervelocity * Time.deltaTime);
 
         // Reset velocity when grounded
@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGrounded)
         {
-            // Calculate jump velocity
+            // Calculates jump velocity
             playervelocity.y = Mathf.Sqrt(jumpHeight * -3f * gravity);
         }
     }
