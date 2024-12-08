@@ -1,7 +1,7 @@
 # Shooter
 Shooter Game
 Overview
-This is a first-person shooter game where the player must avoid or defeat an enemy that patrols a designated area. The enemy follows a random patrol path but will aggressively chase and attack the player upon detection. The goal is to survive and eliminate the enemy.
+This is a first-person shooter game where the player must avoid or defeat an enemy that patrols a designated area. The enemy follows a random patrol path but will aggressively chase and attack the player upon detection. The goal is to eliminate the enemy.
 
 Gameplay Instructions
 Movement: Use W, A, S, D to move around, and Space to jump.
